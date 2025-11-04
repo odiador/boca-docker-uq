@@ -32,6 +32,19 @@ services:
         build: 
             context: .
             dockerfile: docker/dev/web/Dockerfile
+        depends_on:
+            - boca-db
+        environment:
+            - BOCA_DB_HOST=${BOCA_DB_HOST}
+            - BOCA_DB_USER=${BOCA_DB_USER}
+            - BOCA_DB_PASSWORD=${BOCA_DB_PASSWORD}
+            - BOCA_DB_SUPER_USER=${BOCA_DB_SUPER_USER}
+            - BOCA_DB_SUPER_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
+            - BOCA_DB_NAME=${BOCA_DB_NAME}
+            - BOCA_PASSWORD=${BOCA_PASSWORD}
+            - BOCA_KEY=${BOCA_KEY}
+        ports:
+            - 8000:80
         # CAUTION: this bind mount will overwrite BOCA website.
         # For future development...
         # volumes:
@@ -42,10 +55,31 @@ services:
         build: 
             context: .
             dockerfile: docker/dev/jail/Dockerfile
+        privileged: true
+        depends_on:
+            - boca-db
+        environment:
+            - BOCA_DB_HOST=${BOCA_DB_HOST}
+            - BOCA_DB_USER=${BOCA_DB_USER}
+            - BOCA_DB_PASSWORD=${BOCA_DB_PASSWORD}
+            - BOCA_DB_SUPER_USER=${BOCA_DB_SUPER_USER}
+            - BOCA_DB_SUPER_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
+            - BOCA_DB_NAME=${BOCA_DB_NAME}
+            - BOCA_SKIP_SAFEEXEC=${BOCA_SKIP_SAFEEXEC}
+        volumes:
+            - jail-data:/bocajail/tmp
+            - ./fix-jail.sh:/docker-entrypoint-initdb.d/fix-jail.sh
 
     # boca-db:
     #     volumes: 
     #         - db-data:/var/lib/postgresql/data
+
+    boca-db:
+        image: postgres:14-alpine
+        environment:
+            - POSTGRES_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
+        volumes:
+            - db-data:/var/lib/postgresql/data
 
     boca-adminer:
         image: adminer:latest
@@ -54,6 +88,6 @@ services:
         ports:
             - 8080:8080
 
-# volumes:
-#
-#     db-data:
+volumes:
+    db-data:
+    jail-data:

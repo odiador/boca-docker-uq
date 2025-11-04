@@ -49,6 +49,10 @@ RUN apt-get -y update \
         makepasswd \
         quotatool \
         schroot \
+        openjdk-11-jdk-headless \
+        openjdk-17-jdk-headless \
+        kotlin \
+        elixir \
     && rm -rf /var/lib/apt/lists/*
 
 # https://bugs.launchpad.net/ubuntu/+source/ca-certificates-java/+bug/2019908
@@ -77,6 +81,13 @@ RUN \
     # && chmod 700 /usr/sbin/boca-autojudge
 
 RUN boca-createjail || true
+
+# Install Elixir inside the chroot
+# hadolint ignore=DL3003,DL3008,DL3015
+RUN chroot /home/bocajail apt-get -y update \
+    && chroot /home/bocajail apt-get -y install \
+        elixir \
+    && chroot /home/bocajail rm -rf /var/lib/apt/lists/*
 
 # OpenJDK 17 installation with chroot does not work as expected
 # Workaround: Install OpenJDK 17 manually

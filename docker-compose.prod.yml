@@ -22,57 +22,49 @@
 services:
     # web app
     boca-web:
-        image: ghcr.io/joaofazolo/boca-docker/boca-web:latest
+        image: boca-web:latest
         depends_on:
             - boca-db
-        deploy:
-            mode: global
-            placement:
-                constraints:
-                    - "node.role==manager"
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 1024M
-                reservations:
-                    cpus: '0.25'
-                    memory: 512M
-            restart_policy:
-                condition: on-failure
+        environment:
+            - BOCA_DB_HOST=${BOCA_DB_HOST}
+            - BOCA_DB_USER=${BOCA_DB_USER}
+            - BOCA_DB_PASSWORD=${BOCA_DB_PASSWORD}
+            - BOCA_DB_SUPER_USER=${BOCA_DB_SUPER_USER}
+            - BOCA_DB_SUPER_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
+            - BOCA_DB_NAME=${BOCA_DB_NAME}
+            - BOCA_PASSWORD=${BOCA_PASSWORD}
+            - BOCA_KEY=${BOCA_KEY}
+        ports:
+            - "8000:80"
+        volumes:
+            - jail-data:/bocajail/tmp
 
     # online judge
     boca-jail:
-        image: ghcr.io/joaofazolo/boca-docker/boca-jail:latest
+        image: boca-jail:latest
         depends_on:
             - boca-db
-        deploy:
-            mode: replicated
-            replicas: 1
-            placement:
-                max_replicas_per_node: 8
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 1024M
-                reservations:
-                    cpus: '0.25'
-                    memory: 512M
-            restart_policy:
-                condition: on-failure
+        privileged: true
+        environment:
+            - BOCA_DB_HOST=${BOCA_DB_HOST}
+            - BOCA_DB_USER=${BOCA_DB_USER}
+            - BOCA_DB_PASSWORD=${BOCA_DB_PASSWORD}
+            - BOCA_DB_SUPER_USER=${BOCA_DB_SUPER_USER}
+            - BOCA_DB_SUPER_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
+            - BOCA_DB_NAME=${BOCA_DB_NAME}
+            - BOCA_SKIP_SAFEEXEC=${BOCA_SKIP_SAFEEXEC}
+        volumes:
+            - jail-data:/bocajail/tmp
+            - ./fix-jail.sh:/docker-entrypoint-initdb.d/fix-jail.sh
 
     # database
     boca-db:
-        deploy:
-            mode: global
-            placement:
-                constraints:
-                    - "node.role==manager"
-            resources:
-                limits:
-                    cpus: '0.50'
-                    memory: 2048M
-                reservations:
-                    cpus: '0.25'
-                    memory: 1024M
-            restart_policy:
-                condition: on-failure
+        image: postgres:14-alpine
+        environment:
+            - POSTGRES_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
+        volumes:
+            - db-data:/var/lib/postgresql/data
+
+volumes:
+    db-data:
+    jail-data:
