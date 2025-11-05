@@ -54,6 +54,8 @@ services:
       - BOCA_DB_SUPER_USER=${BOCA_DB_SUPER_USER}
       - BOCA_DB_SUPER_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
       - BOCA_DB_NAME=${BOCA_DB_NAME}
+      - BOCA_PASSWORD=${BOCA_PASSWORD}
+      - BOCA_KEY=${BOCA_KEY}
       - BOCA_SKIP_SAFEEXEC=${BOCA_SKIP_SAFEEXEC:-true}
     volumes:
       - jail-data:/bocajail/tmp
