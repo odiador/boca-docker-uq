@@ -34,7 +34,10 @@ services:
       - BOCA_PASSWORD=${BOCA_PASSWORD}
       - BOCA_KEY=${BOCA_KEY}
     ports:
-      - "8000:80"
+      - target: 80
+        published: 8000
+        protocol: tcp
+        mode: host
     volumes:
       - jail-data:/bocajail/tmp
     deploy:
@@ -65,6 +68,8 @@ services:
       - BOCA_DB_SUPER_USER=${BOCA_DB_SUPER_USER}
       - BOCA_DB_SUPER_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
       - BOCA_DB_NAME=${BOCA_DB_NAME}
+      - BOCA_PASSWORD=${BOCA_PASSWORD}
+      - BOCA_KEY=${BOCA_KEY}
       - BOCA_SKIP_SAFEEXEC=${BOCA_SKIP_SAFEEXEC}
     volumes:
       - jail-data:/bocajail/tmp
