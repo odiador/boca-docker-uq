@@ -71,13 +71,9 @@ RUN mkdir -p $APACHE_LOCK_DIR \
 
 WORKDIR /var/www/boca
 RUN \
-    # install-bocaapache
-    # https://github.com/cassiopc/boca/blob/master/Makefile
-    mkdir -p $APACHE_DIR/sites-available/ \
-    && cp tools/000-boca.conf $APACHE_DIR/sites-available/000-boca.conf \
     # install-scripts
     # https://github.com/cassiopc/boca/blob/master/Makefile
-    && mkdir -p /usr/sbin/ \
+    mkdir -p /usr/sbin/ \
 	&& install tools/dump.sh /usr/sbin/boca-dump \
 	&& chmod 700 /usr/sbin/boca-dump \
     # boca-web.postinst
@@ -85,14 +81,20 @@ RUN \
     && chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" /var/www/boca \
     && chmod -R go-rwx /var/www/boca/src/private \
     && a2enmod ssl \
-    # Necessary SSLCertificateKeyFile
-    # && a2ensite default-ssl \
-    && mkdir -p $APACHE_DIR/sites-enabled \
-    && cp tools/000-boca.conf $APACHE_DIR/sites-enabled/000-boca.conf \
     && a2enmod socache_shmcb \
-    && a2enmod proxy_fcgi setenvif \
-    # && a2enconf php8.1-fpm \
+    && a2enmod proxy_fcgi setenvif
+
+# Copy custom Apache configuration for Universidad del Quindío
+COPY --chmod=644 docker/dev/web/000-boca-uq.conf $APACHE_DIR/sites-available/000-boca.conf
+RUN mkdir -p $APACHE_DIR/sites-enabled \
+    && cp $APACHE_DIR/sites-available/000-boca.conf $APACHE_DIR/sites-enabled/000-boca.conf \
     && apache2ctl configtest
+
+# Download Universidad del Quindío logo
+RUN mkdir -p /var/www/boca/src/images \
+    && wget -q -O /var/www/boca/src/images/logo-uniquindio.png \
+        https://www.uniquindio.edu.co/info/uniquindio/media/bloque2.png \
+    && chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" /var/www/boca/src/images
 
 COPY --chmod=755 --chown="$APACHE_RUN_USER:$APACHE_RUN_GROUP" docker/dev/web/init.sh /
 
@@ -101,7 +103,7 @@ USER $APACHE_RUN_USER
 
 # Add HEALTHCHECK instruction to the container image
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=5 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:80/boca/ || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
 
 EXPOSE 80
 

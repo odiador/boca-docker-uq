@@ -115,6 +115,17 @@ else
   echo "Database and unprivileged user already exist"
 fi
 
+# Customize BOCA login page with Universidad del Quindío logo
+if [ -f "/var/www/boca/src/index.php" ]; then
+  # Check if logo is not already added
+  if ! grep -q "logo-uniquindio.png" /var/www/boca/src/index.php; then
+    echo "Adding Universidad del Quindío logo to login page..."
+    # Add logo in a new table row after "BOCA Login"
+    sed -i "s|<div align=\"center\"><font face=\"Verdana, Arial, Helvetica, sans-serif\" size=\"+1\">|<div align=\"center\"><font face=\"Verdana, Arial, Helvetica, sans-serif\" size=\"+1\">|g" /var/www/boca/src/index.php
+    sed -i "s|BOCA Login</font></div>|BOCA Login</font></div>\n              </td>\n            </tr>\n            <tr>\n              <td nowrap>\n                <div align=\"center\"><img src=\"/images/logo-uniquindio.png\" alt=\"Universidad del Quindío\" style=\"max-width: 32px; height: auto;\"></div>|g" /var/www/boca/src/index.php
+  fi
+fi
+
 # Use exec format to run program directly as pid 1
 # https://www.padok.fr/en/blog/docker-processes-container
 exec apache2 -DFOREGROUND

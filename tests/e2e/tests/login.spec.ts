@@ -50,7 +50,7 @@ test.describe.serial("Login test scenarios", () => {
     });
 
     // Go to the starting url before each test
-    await page.goto('/boca');
+    await page.goto('/');
 
     // Check if this is the login page
     await checkLoginPage(page);

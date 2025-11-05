@@ -34,10 +34,19 @@ services:
       - BOCA_PASSWORD=${BOCA_PASSWORD}
       - BOCA_KEY=${BOCA_KEY}
     ports:
-      - target: 80
-        published: 8000
-        protocol: tcp
-        mode: host
+        - "8000:80"
+    #   - target: 80
+    #     published: 8000
+    #     protocol: tcp
+    #     mode: host
+
+    # networks:
+    #   - traefik-public
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.boca.rule=Host(`${BOCA_HOSTNAME}`)"
+    #   - "traefik.http.routers.boca.entrypoints=websecure"
+    #   - "traefik.http.routers.boca.tls.certresolver=le"
     volumes:
       - jail-data:/bocajail/tmp
     deploy:
@@ -114,3 +123,7 @@ services:
 volumes:
   db-data:
   jail-data:
+
+# networks:
+#   traefik-public:
+#     external: true
