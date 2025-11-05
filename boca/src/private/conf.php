@@ -18,36 +18,39 @@
 // Last modified 05/aug/2012 by cassio@ime.usp.br
 
 function globalconf() {
+  // Database encoding settings with safe defaults
   $conf["dbencoding"]= getenv('BOCA_DB_ENCODING') ? getenv('BOCA_DB_ENCODING') : "UTF8";
   $conf["dbclientenc"]= getenv('BOCA_DB_CLIENT_ENCODING') ? getenv('BOCA_DB_CLIENT_ENCODING') : "UTF8";
   $conf['doenc']= getenv('BOCA_DO_ENCRYPTION') ? getenv('BOCA_DO_ENCRYPTION') : false;
 
+  // Database connection settings with safe defaults
   $conf["dblocal"]= getenv('BOCA_IS_DB_LOCAL') ? getenv('BOCA_IS_DB_LOCAL') : "false"; // use unix socket to connect?
   $conf["dbhost"]= getenv('BOCA_DB_HOST') ? getenv('BOCA_DB_HOST') : "localhost";
   $conf["dbport"]= getenv('BOCA_DB_PORT') ? getenv('BOCA_DB_PORT') : "5432";
 
-  $conf["dbname"]= getenv('BOCA_DB_NAME') ? getenv('BOCA_DB_NAME') : "bocadb"; // name of the boca database
+  // REQUIRED: Database name (no default for security)
+  $conf["dbname"]= getenv('BOCA_DB_NAME') ?: die("ERROR: BOCA_DB_NAME environment variable is required\n");
 
-  $conf["dbuser"]= getenv('BOCA_DB_USER') ? getenv('BOCA_DB_USER') : "bocauser"; // unprivileged boca user
-  $conf["dbpass"]= getenv('BOCA_DB_PASSWORD') ? getenv('BOCA_DB_PASSWORD') : "dAm0HAiC";
+  // REQUIRED: Database credentials (no defaults for security)
+  $conf["dbuser"]= getenv('BOCA_DB_USER') ?: die("ERROR: BOCA_DB_USER environment variable is required\n");
+  $conf["dbpass"]= getenv('BOCA_DB_PASSWORD') ?: die("ERROR: BOCA_DB_PASSWORD environment variable is required\n");
 
-  $conf["dbsuperuser"]= getenv('BOCA_DB_SUPER_USER') ? getenv('BOCA_DB_SUPER_USER') : "bocauser"; // privileged boca user
-  $conf["dbsuperpass"]= getenv('BOCA_DB_SUPER_PASSWORD') ? getenv('BOCA_DB_SUPER_PASSWORD') : "dAm0HAiC";
+  $conf["dbsuperuser"]= getenv('BOCA_DB_SUPER_USER') ?: die("ERROR: BOCA_DB_SUPER_USER environment variable is required\n");
+  $conf["dbsuperpass"]= getenv('BOCA_DB_SUPER_PASSWORD') ?: die("ERROR: BOCA_DB_SUPER_PASSWORD environment variable is required\n");
 
   // note that it is fine to use the same user
 
-  // initial password that is used for the user admin -- set it
-  // to something hard to guess if the server is available
-  // online even in the moment you are creating the contest
+  // REQUIRED: Initial password for system and admin users
+  // Set it to something hard to guess if the server is available online
   // In this way, the new accounts for system and admin that are
-  // eventually created come already with the password set to this
-  // value. It is your task later to update these passwords to
-  // some other values within the BOCA web interface.
-  $conf["basepass"]= getenv('BOCA_PASSWORD') ? getenv('BOCA_PASSWORD') : "boca";
+  // eventually created come already with the password set to this value.
+  // It is your task later to update these passwords to some other values
+  // within the BOCA web interface.
+  $conf["basepass"]= getenv('BOCA_PASSWORD') ?: die("ERROR: BOCA_PASSWORD environment variable is required\n");
 
-  // secret key to be used in HTTP headers
-  // you MUST set it with any random large enough sequence
-  $conf["key"]= getenv('BOCA_KEY') ? getenv('BOCA_KEY') : "GG56KFJtNDBGjJprR6ex";
+  // REQUIRED: Secret key to be used in HTTP headers
+  // You MUST set it with any random large enough sequence
+  $conf["key"]= getenv('BOCA_KEY') ?: die("ERROR: BOCA_KEY environment variable is required\n");
 
   // the following field is used by the autojudging script
   // set it with the ip of the computer running the script

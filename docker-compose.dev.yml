@@ -1,93 +1,48 @@
 ---
 #========================================================================
-# Copyright Universidade Federal do Espirito Santo (Ufes)
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# Development Docker Compose - Build images locally
 # 
-# This program is released under license GNU GPL v3+ license.
+# This file extends docker-compose.yml and adds build configurations
+# for local development. Use this when you want to build images locally
+# instead of pulling from GHCR.
 #
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml build
 #========================================================================
 
 services:
+  # Base image (required for web and jail builds)
+  boca-base:
+    image: ghcr.io/odiador/boca-base:latest
+    build: 
+      context: .
+      dockerfile: docker/dev/base/Dockerfile
 
-    boca-base:
-        image: boca-base:latest
-        build: 
-            context: .
-            dockerfile: docker/dev/base/Dockerfile
+  # Web app - override with build config
+  boca-web:
+    image: ghcr.io/odiador/boca-web:latest
+    build:
+      context: .
+      dockerfile: docker/dev/web/Dockerfile
+      args:
+        BASE_IMAGE: ghcr.io/odiador/boca-base:latest
 
-    boca-web:
-        image: boca-web:latest
-        build: 
-            context: .
-            dockerfile: docker/dev/web/Dockerfile
-        depends_on:
-            - boca-db
-        environment:
-            - BOCA_DB_HOST=${BOCA_DB_HOST}
-            - BOCA_DB_USER=${BOCA_DB_USER}
-            - BOCA_DB_PASSWORD=${BOCA_DB_PASSWORD}
-            - BOCA_DB_SUPER_USER=${BOCA_DB_SUPER_USER}
-            - BOCA_DB_SUPER_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
-            - BOCA_DB_NAME=${BOCA_DB_NAME}
-            - BOCA_PASSWORD=${BOCA_PASSWORD}
-            - BOCA_KEY=${BOCA_KEY}
-        ports:
-            - 8000:80
-        # CAUTION: this bind mount will overwrite BOCA website.
-        # For future development...
-        # volumes:
-        #     - ./src:/var/www/boca/src
+  # Online judge - override with build config
+  boca-jail:
+    image: ghcr.io/odiador/boca-jail:latest
+    build:
+      context: .
+      dockerfile: docker/dev/jail/Dockerfile
+      args:
+        BASE_IMAGE: ghcr.io/odiador/boca-base:latest
 
-    boca-jail:
-        image: boca-jail:latest
-        build: 
-            context: .
-            dockerfile: docker/dev/jail/Dockerfile
-        privileged: true
-        depends_on:
-            - boca-db
-        environment:
-            - BOCA_DB_HOST=${BOCA_DB_HOST}
-            - BOCA_DB_USER=${BOCA_DB_USER}
-            - BOCA_DB_PASSWORD=${BOCA_DB_PASSWORD}
-            - BOCA_DB_SUPER_USER=${BOCA_DB_SUPER_USER}
-            - BOCA_DB_SUPER_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
-            - BOCA_DB_NAME=${BOCA_DB_NAME}
-            - BOCA_SKIP_SAFEEXEC=${BOCA_SKIP_SAFEEXEC}
-        volumes:
-            - jail-data:/bocajail/tmp
-            - ./fix-jail.sh:/docker-entrypoint-initdb.d/fix-jail.sh
-
-    # boca-db:
-    #     volumes: 
-    #         - db-data:/var/lib/postgresql/data
-
-    boca-db:
-        image: postgres:14-alpine
-        environment:
-            - POSTGRES_PASSWORD=${BOCA_DB_SUPER_PASSWORD}
-        volumes:
-            - db-data:/var/lib/postgresql/data
-
-    boca-adminer:
-        image: adminer:latest
-        environment:
-            - ADMINER_DEFAULT_SERVER=boca-db
-        ports:
-            - 8080:8080
-
-volumes:
-    db-data:
-    jail-data:
+  # Database admin interface (optional for development)
+  boca-adminer:
+    image: adminer:latest
+    depends_on:
+      - boca-db
+    environment:
+      - ADMINER_DEFAULT_SERVER=boca-db
+    ports:
+      - "8080:8080"

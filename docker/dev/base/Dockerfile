@@ -56,30 +56,30 @@ ARG TARGETOS
 ARG TARGETARCH
 
 LABEL authors="Joao Vitor Alves Fazolo, Rodrigo Laiola Guimaraes"
-ENV CREATED_AT 2020-06-26
-ENV UPDATED_AT 2023-06-01
+ENV CREATED_AT=2020-06-26
+ENV UPDATED_AT=2023-06-01
 
 # No interactive frontend during docker build
-ENV DEBIAN_FRONTEND noninteractive
-ENV DEBCONF_NONINTERACTIVE_SEEN true
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
 
 # Locale and encoding settings
-ENV LANG_WHICH en
-ENV LANG_WHERE US
-ENV ENCODING UTF-8
-ENV LC_ALL C.${ENCODING}
-ENV LANGUAGE ${LANG_WHICH}_${LANG_WHERE}.${ENCODING}
-ENV LANG ${LANGUAGE}
+ENV LANG_WHICH=en
+ENV LANG_WHERE=US
+ENV ENCODING=UTF-8
+ENV LC_ALL=C.${ENCODING}
+ENV LANGUAGE=${LANG_WHICH}_${LANG_WHERE}.${ENCODING}
+ENV LANG=${LANGUAGE}
 
 # Timezone settings
 # Full list at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 # e.g. "US/Pacific" for Los Angeles, California, USA
-# e.g. ENV TZ "US/Pacific"
-ENV TZ America/Sao_Paulo
+# e.g. ENV TZ="US/Pacific"
+ENV TZ=America/Bogota
 
 # Apache settings
-ENV APACHE_RUN_USER  www-data
-ENV APACHE_RUN_GROUP www-data
+ENV APACHE_RUN_USER=www-data
+ENV APACHE_RUN_GROUP=www-data
 
 # Redundant but to ensure we are not going to break anything
 # https://github.com/cassiopc/boca/tree/master/doc

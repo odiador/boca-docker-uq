@@ -29,8 +29,8 @@ ARG TARGETOS
 ARG TARGETARCH
 
 LABEL authors="Joao Vitor Alves Fazolo, Rodrigo Laiola Guimaraes"
-ENV CREATED_AT 2020-06-26
-ENV UPDATED_AT 2023-06-01
+ENV CREATED_AT=2020-06-26
+ENV UPDATED_AT=2023-06-01
 
 # Redundant but to ensure we are not going to break anything
 # https://github.com/cassiopc/boca/tree/master/tools
